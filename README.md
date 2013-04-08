@@ -16,3 +16,9 @@ application directory structure:
 <app-deploy-user>/apps/<app_names>/<pkg_names>/current #linked to latest version
 <app-deploy-user>/apps/<app_names>/<pkg_names>/<pkg version>
 ```
+
+pkg source directory structure:
+```
+<app-deploy-user>/pkgs/source/pkg_name/<pkg version>
+<app-deploy-user>/pkgs/source/pkg_name/git/ #for git based projects
+```
