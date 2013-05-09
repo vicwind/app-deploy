@@ -1,0 +1,9 @@
+# server *hosts
+
+# namespace :deploy_test do
+  # desc "Search Remote Application Server Libraries"
+  # task :search_libs,  :roles => :app do
+    # run "ls -x1 /usr/lib"
+  # end
+# end
+
