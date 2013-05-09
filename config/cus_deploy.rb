@@ -4,6 +4,8 @@ require "shellwords"
 require "yaml"
 require "capistrano/recipes/deploy/scm"
 require "capistrano/recipes/deploy/strategy"
+require "#{File.dirname(__FILE__)}/../lib/build_and_copy"
+
 
 def _cset(name, *args, &block)
   unless exists?(name)
@@ -43,7 +45,10 @@ _cset :pkg_path, "/tmp/pkgs/#{application}"
 _cset(:source)            { Capistrano::Deploy::SCM.new(scm, self) }
 _cset(:real_revision)     { source.local.query_revision(revision) { |cmd| with_env("LC_ALL", "C") { run_locally(cmd) } } }
 
-_cset(:strategy)          { Capistrano::Deploy::Strategy.new(deploy_via, self) }
+# _cset(:strategy)          { Capistrano::Deploy::Strategy.new(deploy_via, self) }
+_cset(:strategy)          {
+  deploy_via == "build_and_copy" ? Capistrano::Deploy::Strategy::BuidAndCopy.new(self) : Capistrano::Deploy::Strategy.new(deploy_via, self) 
+}
 
 # If overriding release name, please also select an appropriate setting for :releases below.
 _cset(:release_name)      { set :deploy_timestamped, true; Time.now.utc.strftime("%Y%m%d%H%M%S") }
