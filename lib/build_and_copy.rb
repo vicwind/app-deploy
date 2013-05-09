@@ -12,7 +12,7 @@ module Capistrano
         # Executes the SCM command for this strategy and writes the REVISION
         # mark file to each host.
         def deploy!
-          scm_run "rm -rf /tmp/pkgs/#{configuration[:application]}/source/ && #{command}"
+          scm_run "rm -rf /tmp/pkgs/#{configuration[:application]}/source/ && #{command} && rvm rvmrc trust /tmp/pkgs/TireFinder/source/.rvmrc"
           gzip_source
           deploy_pkg
         end

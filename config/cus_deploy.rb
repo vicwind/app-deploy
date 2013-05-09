@@ -6,7 +6,6 @@ require "capistrano/recipes/deploy/scm"
 require "capistrano/recipes/deploy/strategy"
 require "#{File.dirname(__FILE__)}/../lib/build_and_copy"
 
-
 def _cset(name, *args, &block)
   unless exists?(name)
     set(name, *args, &block)
@@ -47,7 +46,7 @@ _cset(:real_revision)     { source.local.query_revision(revision) { |cmd| with_e
 
 # _cset(:strategy)          { Capistrano::Deploy::Strategy.new(deploy_via, self) }
 _cset(:strategy)          {
-  deploy_via == "build_and_copy" ? Capistrano::Deploy::Strategy::BuidAndCopy.new(self) : Capistrano::Deploy::Strategy.new(deploy_via, self) 
+  deploy_via == "build_and_copy" ? Capistrano::Deploy::Strategy::BuildAndCopy.new(self) : Capistrano::Deploy::Strategy.new(deploy_via, self) 
 }
 
 # If overriding release name, please also select an appropriate setting for :releases below.
