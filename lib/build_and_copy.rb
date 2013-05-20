@@ -12,7 +12,7 @@ module Capistrano
         # Executes the SCM command for this strategy and writes the REVISION
         # mark file to each host.
         def deploy!
-          scm_run "rm -rf /tmp/pkgs/#{configuration[:application]}/source/ && #{command} && rvm rvmrc trust /tmp/pkgs/TireFinder/source/.rvmrc"
+          scm_run "export rvm_trust_rvmrcs_flag=1 && rm -rf /tmp/pkgs/#{configuration[:application]}/source/ && #{command}"
           gzip_source
           deploy_pkg
         end
@@ -63,15 +63,17 @@ module Capistrano
              command = "scp /tmp/#{configuration[:application]}_#{$$}.gz #{host}:/tmp"
              run(command, hosts: configuration[:build_server])
            end
-           command = "mkdir -p #{configuration[:pkgs_path]} && tar -xzvf /tmp/#{configuration[:application]}_#{$$}.gz -C /tmp && mv /tmp/#{configuration[:application]}/source #{configuration[:pkgs_path]}/#{configuration[:release_name]} && rm -rf /tmp/#{configuration[:application]}"
+           tmp_unzip_dir = "/tmp/#{configuration[:application]}_#{$$}"
+           command = "mkdir -p #{configuration[:pkgs_path]} && mkdir -p #{tmp_unzip_dir} && tar -xzf /tmp/#{configuration[:application]}_#{$$}.gz -C #{tmp_unzip_dir}  && mv #{tmp_unzip_dir}/source #{configuration[:pkgs_path]}/#{configuration[:release_name]} && rm -rf #{tmp_unzip_dir}"
            run(command, hosts: host)
            command = "mkdir -p #{configuration[:releases_path]} && cp -R #{configuration[:pkgs_path]}/#{configuration[:release_name]} #{configuration[:releases_path]}"
            run(command, hosts: host)
+           run("rvm rvmrc trust #{current_release}/.rvmrc")
          end
         end
 
         def gzip_source
-          command = "cd /tmp/pkgs && tar --exclude '.git' --exclude \"*.log\" -czvf /tmp/#{configuration[:application]}_#{$$}.gz #{configuration[:application]}"
+          command = "cd /tmp/pkgs/#{configuration[:application]} && rm -f /tmp/#{configuration[:application]}_*.gz && tar --exclude '.git' --exclude \"*.log\" -czf /tmp/#{configuration[:application]}_#{$$}.gz source"
           run(command, hosts: configuration[:build_server])
         end
       end

@@ -46,6 +46,7 @@ _cset(:real_revision)     { source.local.query_revision(revision) { |cmd| with_e
 
 # _cset(:strategy)          { Capistrano::Deploy::Strategy.new(deploy_via, self) }
 _cset(:strategy)          {
+  puts "here......."
   deploy_via == "build_and_copy" ? Capistrano::Deploy::Strategy::BuildAndCopy.new(self) : Capistrano::Deploy::Strategy.new(deploy_via, self) 
 }
 
@@ -256,7 +257,9 @@ namespace :deploy do
     defaults to :checkout).
   DESC
   task :update_code, :except => { :no_release => true } do
-    on_rollback { run "rm -rf #{release_path}; true" }
+    on_rollback { 
+      binding.pry
+      run "rm -rf #{release_path}; true" }
     strategy.deploy!
     finalize_update
   end
@@ -373,6 +376,7 @@ namespace :deploy do
   DESC
   task :restart, :roles => :app, :except => { :no_release => true } do
     # Empty Task to overload with your platform specifics
+    run "export TIRE_FINDER_ROOT=#{current_path} && cd #{current_path} && ./config/unicorn_init.sh restart"
   end
 
   namespace :rollback do
@@ -535,6 +539,9 @@ namespace :deploy do
     specific behaviour.
   DESC
   task :start, :roles => :app do
+    # run "TIRE_FINDER_ROOT=#{current_path} #{current_path}/config/unicorn_init.sh start"
+    run "rvm rvmrc trust #{current_path}"
+    run "export TIRE_FINDER_ROOT=#{current_path} && cd #{current_path} && ./config/unicorn_init.sh start"
     # Empty Task to overload with your platform specifics
   end
 
@@ -544,6 +551,7 @@ namespace :deploy do
   DESC
   task :stop, :roles => :app do
     # Empty Task to overload with your platform specifics
+    run "export TIRE_FINDER_ROOT=#{current_path} && cd #{current_path} && ./config/unicorn_init.sh stop"
   end
 
   namespace :pending do
