@@ -1,5 +1,5 @@
 def select_applications
-  app_config_dir = 'config/'
+  app_config_dir = 'config/projects/'
   app_dirs = Dir.entries(app_config_dir).select do
     |entry| File.directory? File.join(app_config_dir,entry) and !(entry =='.' || entry == '..')
   end
