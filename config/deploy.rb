@@ -40,30 +40,28 @@ require "bundler/capistrano"
 
 # after "deploy:update_code", "rvm:trust_rvmrc"
 
-set :application, "TireFinder"
-role :app, '198.61.239.104', '50.57.95.199'
+# set :application, "TireFinder"
+# app_servers = ['198.61.239.104', '50.57.95.199']
+# set :build_server, '198.61.239.104'
 
-role :web, '198.61.239.104', '50.57.95.199'
+# role :app, *app_servers
+# role :web, *app_servers
 
-# set :gateway, '198.61.239.104'
-set :app_hosts, ['198.61.239.104', '50.57.95.199']
-set :deploy_to, "/home/innov_apps/apps/#{application}"
-# set :app_base_path, "/tmp/apps/"
-# set :app_path, File.join(app_base_path, application)
+# # set :gateway, '198.61.239.104'
+# # set :app_hosts, app_servers
+# set :deploy_to, "/home/innov_apps/apps/#{application}"
 
-default_run_options[:pty] = true
-default_run_options[:shell] = '/bin/bash --login'
-ssh_options[:forward_agent] = true
+# default_run_options[:pty] = true
+# default_run_options[:shell] = '/bin/bash --login'
+# ssh_options[:forward_agent] = true
 
-# set :repository, "https://github.com/vicwind/app-deploy.git"  # Your clone URL
-set :repository, "git@github.com:WMTLabsInnov/TireFinder.git"  # Your clone URL
-set :scm, "git"
-# set :scm_passphrase, "p@ssw0rd"
-set :branch, "master"
-set :git_shallow_clone, 1
-set :use_sudo, false
-set :user, "innov_apps"
-set :deploy_via, "build_and_copy"
-set :build_server, '198.61.239.104'
-# set :releases_path, '/tmp/pkg/'
+# # set :repository, "https://github.com/vicwind/app-deploy.git"  # Your clone URL
+# set :repository, "git@github.com:WMTLabsInnov/TireFinder.git"  # Your clone URL
+# set :scm, "git"
+# # set :scm_passphrase, "p@ssw0rd"
+# set :branch, "master"
+# set :git_shallow_clone, 1
+# set :use_sudo, false
+# set :user, "innov_apps"
+# set :deploy_via, "build_and_copy"
 

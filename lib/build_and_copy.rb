@@ -9,10 +9,22 @@ module Capistrano
       # target host. This is the default deployment strategy for Capistrano.
       class BuildAndCopy < Capistrano::Deploy::Strategy::Base
 
+        # class << self; attr_accessor :tmp_pkg_location end
+        attr_accessor :tmp_pkg_location
+
+        def initialize(*args)
+          @tmp_pkg_location = File.join('/','tmp','pkgs')
+          super(*args)
+        end
+
+        #pkg_location
+        #
         # Executes the SCM command for this strategy and writes the REVISION
         # mark file to each host.
         def deploy!
-          scm_run "export rvm_trust_rvmrcs_flag=1 && rm -rf /tmp/pkgs/#{configuration[:application]}/source/ && #{command}"
+
+          scm_run "export rvm_trust_rvmrcs_flag=1 && rm -rf #{File.join(@tmp_pkg_location,
+            configuration[:application].to_s, 'source')} && #{command}"
           gzip_source
           deploy_pkg
         end
@@ -53,18 +65,20 @@ module Capistrano
         # Returns the SCM's checkout command for the revision to deploy.
         def command
           # @command ||= source.checkout(revision, configuration[:release_path])
-          @command ||= source.checkout(revision, "/tmp/pkgs/#{configuration[:application]}/source")
+          @command ||= source.checkout(revision, File.join(@tmp_pkg_location, configuration[:application].to_s, 'source'))
         end
 
         def deploy_pkg
 
          configuration[:app_hosts].map do |host|
+           tmp_gzip_pkg_file_path = File.join('/', 'tmp', "#{configuration[:application]}_#{$$}.gz")
+
            if host != configuration[:build_server]
-             command = "scp /tmp/#{configuration[:application]}_#{$$}.gz #{host}:/tmp"
+             command = "scp #{tmp_gzip_pkg_file_path} #{host}:/tmp"
              run(command, hosts: configuration[:build_server])
            end
-           tmp_unzip_dir = "/tmp/#{configuration[:application]}_#{$$}"
-           command = "mkdir -p #{configuration[:pkgs_path]} && mkdir -p #{tmp_unzip_dir} && tar -xzf /tmp/#{configuration[:application]}_#{$$}.gz -C #{tmp_unzip_dir}  && mv #{tmp_unzip_dir}/source #{configuration[:pkgs_path]}/#{configuration[:release_name]} && rm -rf #{tmp_unzip_dir}"
+           tmp_unzip_dir = File.join("/", "tmp", "#{configuration[:application]}_#{$$}")
+           command = "mkdir -p #{configuration[:pkgs_path]} && mkdir -p #{tmp_unzip_dir} && tar -xzf #{tmp_gzip_pkg_file_path} -C #{tmp_unzip_dir} && mv #{tmp_unzip_dir}/source #{configuration[:pkgs_path]}/#{configuration[:release_name]} && rm -rf #{tmp_unzip_dir}"
            run(command, hosts: host)
            command = "mkdir -p #{configuration[:releases_path]} && cp -R #{configuration[:pkgs_path]}/#{configuration[:release_name]} #{configuration[:releases_path]}"
            run(command, hosts: host)
@@ -73,7 +87,7 @@ module Capistrano
         end
 
         def gzip_source
-          command = "cd /tmp/pkgs/#{configuration[:application]} && rm -f /tmp/#{configuration[:application]}_*.gz && tar --exclude '.git' --exclude \"*.log\" -czf /tmp/#{configuration[:application]}_#{$$}.gz source"
+          command = "cd #{File.join(@tmp_pkg_location, configuration[:application].to_s)} && rm -f /tmp/#{configuration[:application]}_*.gz && tar --exclude '.git' --exclude \"*.log\" -czf /tmp/#{configuration[:application]}_#{$$}.gz source"
           run(command, hosts: configuration[:build_server])
         end
       end

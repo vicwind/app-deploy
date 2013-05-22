@@ -28,13 +28,12 @@ _cset(:repository)  { abort "Please specify the repository that houses your appl
 _cset(:scm) { scm_default }
 _cset :deploy_via, :checkout
 
-_cset(:deploy_to) { "/u/apps/#{application}" }
+_cset(:deploy_to) { "#{ENV['HOME']}/apps/#{application}" }
 _cset(:revision)  { source.head }
 
 _cset :rails_env, "production"
 _cset :rake, "rake"
 
-_cset :pkg_path, "/tmp/pkgs/#{application}"
 # =========================================================================
 # These variables should NOT be changed unless you are very confident in
 # what you are doing. Make sure you understand all the implications of your
@@ -46,8 +45,8 @@ _cset(:real_revision)     { source.local.query_revision(revision) { |cmd| with_e
 
 # _cset(:strategy)          { Capistrano::Deploy::Strategy.new(deploy_via, self) }
 _cset(:strategy)          {
-  puts "here......."
-  deploy_via == "build_and_copy" ? Capistrano::Deploy::Strategy::BuildAndCopy.new(self) : Capistrano::Deploy::Strategy.new(deploy_via, self) 
+  puts "Using Custome Deploy..."
+  deploy_via == "build_and_copy" ? Capistrano::Deploy::Strategy::BuildAndCopy.new(self) : Capistrano::Deploy::Strategy.new(deploy_via, self)
 }
 
 # If overriding release name, please also select an appropriate setting for :releases below.
@@ -59,7 +58,7 @@ _cset :shared_children,   %w(public/system log tmp/pids)
 _cset :current_dir,       "current"
 
 _cset(:releases_path)     { File.join(deploy_to, version_dir) }
-_cset(:pkgs_path)         { File.join(pkg_path, version_dir) }
+_cset(:pkgs_path)         { File.join("/tmp/pkgs/#{application}", version_dir) }
 _cset(:shared_path)       { File.join(deploy_to, shared_dir) }
 _cset(:current_path)      { File.join(deploy_to, current_dir) }
 _cset(:release_path)      { File.join(releases_path, release_name) }
@@ -257,9 +256,7 @@ namespace :deploy do
     defaults to :checkout).
   DESC
   task :update_code, :except => { :no_release => true } do
-    on_rollback { 
-      binding.pry
-      run "rm -rf #{release_path}; true" }
+    on_rollback { run "rm -rf #{release_path}; true" }
     strategy.deploy!
     finalize_update
   end
