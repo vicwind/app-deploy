@@ -373,6 +373,7 @@ namespace :deploy do
   DESC
   task :restart, :roles => :app, :except => { :no_release => true } do
     # Empty Task to overload with your platform specifics
+    #
     run "export TIRE_FINDER_ROOT=#{current_path} && cd #{current_path} && ./config/unicorn_init.sh restart"
   end
 
@@ -538,7 +539,7 @@ namespace :deploy do
   task :start, :roles => :app do
     # run "TIRE_FINDER_ROOT=#{current_path} #{current_path}/config/unicorn_init.sh start"
     run "rvm rvmrc trust #{current_path}"
-    run "export TIRE_FINDER_ROOT=#{current_path} && cd #{current_path} && ./config/unicorn_init.sh start"
+    run "export TIRE_FINDER_ROOT=#{current_path} && cd #{current_path} && ./config/unicorn_init.sh start #{rails_env}"
     # Empty Task to overload with your platform specifics
   end
 
