@@ -45,7 +45,7 @@ _cset(:real_revision)     { source.local.query_revision(revision) { |cmd| with_e
 
 # _cset(:strategy)          { Capistrano::Deploy::Strategy.new(deploy_via, self) }
 _cset(:strategy)          {
-  puts "Using Custome Deploy..."
+  puts "Using Custom Deploy..."
   deploy_via == "build_and_copy" ? Capistrano::Deploy::Strategy::BuildAndCopy.new(self) : Capistrano::Deploy::Strategy.new(deploy_via, self)
 }
 
