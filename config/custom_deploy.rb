@@ -374,7 +374,7 @@ namespace :deploy do
   task :restart, :roles => :app, :except => { :no_release => true } do
     # Empty Task to overload with your platform specifics
     #
-    run "export TIRE_FINDER_ROOT=#{current_path} && cd #{current_path} && ./config/unicorn_init.sh restart"
+    run "export TIRE_FINDER_ROOT=#{current_path} && cd #{current_path} && ./config/unicorn_init.sh restart #{rails_env}"
   end
 
   namespace :rollback do
