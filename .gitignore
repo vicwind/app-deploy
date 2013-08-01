@@ -12,6 +12,9 @@ test/tmp
 test/version_tmp
 tmp
 
+#ignore Rails app structure directories
+app
+
 # YARD artifacts
 .yardoc
 _yardoc
